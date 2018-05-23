@@ -5,18 +5,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Combo {
-    public ArrayList<double[]> validCombos = new ArrayList<double[]>();
+    public ArrayList<float[]> validCombos = new ArrayList<float[]>();
 
 
     public Combo() {
         this.validCombos = validCombos;
     }
 
-    public ArrayList<double[]> getValidCombos() {
+    public ArrayList<float[]> getValidCombos() {
         return validCombos;
     }
 
-    public void setValidCombos(ArrayList<double[]> validCombos) {
+    public void setValidCombos(ArrayList<float[]> validCombos) {
         this.validCombos = validCombos;
     }
 
