@@ -6,16 +6,16 @@ public class User {
 
     public String userName;
     public ArrayList<Debt> debts;
-    public double money;
+    public float money;
 
     //user object needs a numerical user_id and an array called "debts" of object class: Debt
-    public User(String userName) {
+    public User(String userName, float money) {
         this.userName = userName;
         this.debts = new ArrayList<Debt>();
-        this.money = 0;
+        this.money = money;
     }
 
-    public void addDebt(String debtName, double principal, double interestRate) {
+    public void addDebt(String debtName, float principal, double interestRate) {
         this.debts.add(new Debt(debtName, principal, interestRate));
     }
 
@@ -33,11 +33,11 @@ public class User {
         return this.debts;
     }
 
-    public double getMoney() {
+    public float getMoney() {
         return this.money;
     }
 
-    public void setMoney(double money) {
+    public void setMoney(float money) {
         this.money = money;
     }
 
