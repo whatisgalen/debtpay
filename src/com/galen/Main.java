@@ -4,37 +4,34 @@ import java.util.*;
 
 public class Main {
 
-//    public static User galen1 = new User("galen mancino");
     public static Scanner inputStream = new Scanner(System.in);
 
     //compounding frequency per year
-    final static short COMPOUND_FREQUENCY = 12; //should be 12 for monthly || 1 for annually; 365 not ready
+    final static short CF = 12; //should be 12 for monthly || 1 for annually; 365 not ready
 
 
     public static void main(String[] args) {
 
 //        User user = createUser();
-        User user = new User("galen",1000.f);
+        User user = new User("galen",3000.f);
 //        getDebtsFromUser(user);
 
-        user.addDebt("Student Debt", 8000, 0.0584d);
-        user.addDebt("Cheap Car loan", 7500, 0.09d);
-        user.addDebt("Misc", 15000, 0.063d);
-//        user.addDebt("DebtFour", 9000, 0.04d);
+        user.addDebt("Student Debt", 15000, 0.0584d);
+        user.addDebt("Cheap Car loan", 11000, 0.04d);
+        user.addDebt("Misc", 17500, 0.043d);
+//        user.addDebt("DebtFour", 8000, 0.04d);
 //        user.addDebt("Mortgage",300000,0.045d); //this will have to wait for the memory problem
 //        System.out.println("debts are: " + galen.debts);
-        user.setMoney(1000.0f);
-
-        //Performance notes
-        //@ 4debts, $1000 takes
+        user.setMoney(3000.0f);
 
         byte totalDebts = (byte) user.debts.size();
         float[] mmpList = calculateMMPList(user), data;
         long startTime = System.nanoTime();
         double nanoToSec = Math.pow(10, -9);
 
-        ArrayList<float[]> comboTable = generateCombos(totalDebts,mmpList,user);
+        ArrayList<float[]> comboTable = generateCombos2(totalDebts,mmpList,user);
 
+        //fix this async try/catch block to wait until above is done
         try {
             presentData(user, comboTable.get(0));
         } catch (IndexOutOfBoundsException e) {
@@ -72,7 +69,7 @@ public class Main {
 
             //interestRate of the current debt in the loop
             float rate = (float) user.debts.get(debtNumber).getInterestRate();
-            float r = (rate / COMPOUND_FREQUENCY);
+            float r = (rate / CF);
 
             //grab mmp from corresponding index in input array
             float mmp = row[debtNumber];
@@ -94,7 +91,7 @@ public class Main {
                     miniIntr1 = accruedBal * r;
                     miniIntr2 = (Math.round(miniIntr1 * 100));
                     roundIntr = (miniIntr2 / 100);
-                    accruedBal += (roundIntr - mmp);
+                    accruedBal += (roundIntr - mmp); //subtracting intr from mmp; mmp > intr
 
                     thisTransactionArray.add(accruedBal);
                     accruedIntr += roundIntr;
@@ -122,7 +119,119 @@ public class Main {
                 }
             } //while looping through thisTransactionArray (period++)
         } //for looping through debts (debtNumber++)
+//        System.out.println(Arrays.toString(row)+" & "+totalIntr);
         return totalIntr;
+    }
+
+    public static float calculateComboIntr2(float[] row, User user) {
+        float totalIntr = 0;
+        byte totalDebts = (byte) user.debts.size();
+
+        for (byte debtNumber = 0; debtNumber < totalDebts; debtNumber++) {
+
+//            System.out.println(">>>>>>>>>>>>>>>>");
+//            System.out.println("debt# "+(debtNumber+1)+" / "+user.debts.get(debtNumber).getDebtName());
+//            System.out.println("$"+user.debts.get(debtNumber).getPrincipal()+" / "+(user.debts.get(debtNumber).getInterestRate()*100)+"%");
+//            System.out.println("Starting with debt#"+debtNumber);
+            //reset accruedIntr
+            float accruedIntr = 0;
+
+            //reset principal for this debt
+            float princip = (float) user.debts.get(debtNumber).getPrincipal();
+
+            //interestRate of the current debt in the loop
+            float rate = (float) user.debts.get(debtNumber).getInterestRate();
+            float r = 1+(rate/ CF); //e.g. 1+(0.05/12)
+
+
+            //grab mmp from corresponding index in input array
+            float mmp = row[debtNumber];
+
+            //ln(princip/mmp * (r-1) ) / (ln(r^2) - ln(r) ) = x-intercept of balance function, i.e. when y=0
+//            double periodsToZeroBal = (-1*((Math.log((princip/mmp)*((rate)))) / (((Math.log(Math.pow(r,2)))-(Math.log(r))))));
+            double periodsToZeroBal = ((Math.log((mmp/(r-1))/(-1*(princip-(mmp/(r-1)))))) / (((CF*(Math.log(Math.pow(r,2))))-(CF*(Math.log(r))))));
+//            System.out.println("debt combo:"+(Arrays.toString(row)));
+//            System.out.println("periods to zero:"+periodsToZeroBal);
+            periodsToZeroBal = Math.ceil(periodsToZeroBal);
+
+            //need to find summation of this
+            //calc finds accruedIntr at each period
+            for (int j = 1; j <= (periodsToZeroBal+0) && accruedIntr >= 0; j++) {
+                accruedIntr += (((princip * (float) (Math.pow(r, ((j) - 1)))) - (mmp * (((float) (Math.pow(r, (j - 1))) - 1) / (r - 1)))) * (rate));
+//                accruedIntr += (((princip-(mmp/rate))*(Math.pow(r,((12*j)-1))) +(mmp/rate))*rate);
+
+            }
+            //e.g. ( 7500 * (1 + rate/12)^12x-1 ) - ( 500 *
+
+            totalIntr += accruedIntr;
+//            System.out.println("accruedIntr for this debt= "+accruedIntr);
+        } //for looping through debts (debtNumber++)
+
+//        System.out.println("totalIntr = $"+totalIntr);
+        return totalIntr;
+    }
+
+    public static float calculateComboPeriods(float[] row, User user) {
+        float totalPeriods = 0;
+        byte totalDebts = (byte) user.debts.size();
+
+        for (byte debtNumber = 0; debtNumber < totalDebts; debtNumber++) {
+
+            //reset principal for this debt
+            float princip = (float) user.debts.get(debtNumber).getPrincipal();
+
+            //interestRate of the current debt in the loop
+            float rate = (float) user.debts.get(debtNumber).getInterestRate();
+            float r = 1+(rate/ CF); //e.g. 1+(0.05/12)
+
+
+            //grab mmp from corresponding index in input array
+            float mmp = row[debtNumber];
+
+            //ln(princip/mmp * (r-1) ) / (ln(r^2) - ln(r) ) = x-intercept of balance function, i.e. when y=0
+//            double periodsToZeroBal = (-1*((Math.log((princip/mmp)*((rate)))) / (((Math.log(Math.pow(r,2)))-(Math.log(r))))));
+            double periodsToZeroBal = ((Math.log((mmp/(r-1))/(-1*(princip-(mmp/(r-1)))))) / (((CF*(Math.log(Math.pow(r,2))))-(CF*(Math.log(r))))));
+            totalPeriods += periodsToZeroBal;
+
+        } //for looping through debts (debtNumber++)
+        return totalPeriods;
+    }
+
+    private static float calculateHelperPeriods(float[] row, byte debtNumberA, byte debtNumberB, User user) {
+        float totalPeriods = 0;
+
+        //reset principal for this debt
+        float princip = (float) user.debts.get(debtNumberA).getPrincipal();
+
+        //interestRate of the current debt in the loop
+        float rate = (float) user.debts.get(debtNumberA).getInterestRate();
+        float r = 1+(rate/ CF); //e.g. 1+(0.05/12)
+
+        //grab mmp from corresponding index in input array
+        float mmp = row[0];
+
+        //ln(princip/mmp * (r-1) ) / (ln(r^2) - ln(r) ) = x-intercept of balance function, i.e. when y=0
+//            double periodsToZeroBal = (-1*((Math.log((princip/mmp)*((rate)))) / (((Math.log(Math.pow(r,2)))-(Math.log(r))))));
+        double periodsToZeroBal = ((Math.log((mmp/(r-1))/(-1*(princip-(mmp/(r-1)))))) / (((CF*(Math.log(Math.pow(r,2))))-(CF*(Math.log(r))))));
+        totalPeriods += periodsToZeroBal;
+
+
+        //reset principal for this debt
+        princip = (float) user.debts.get(debtNumberB).getPrincipal();
+
+        //interestRate of the current debt in the loop
+        rate = (float) user.debts.get(debtNumberB).getInterestRate();
+        r = 1+(rate/ CF); //e.g. 1+(0.05/12)
+
+        //grab mmp from corresponding index in input array
+        mmp = row[1];
+
+        //ln(princip/mmp * (r-1) ) / (ln(r^2) - ln(r) ) = x-intercept of balance function, i.e. when y=0
+//            double periodsToZeroBal = (-1*((Math.log((princip/mmp)*((rate)))) / (((Math.log(Math.pow(r,2)))-(Math.log(r))))));
+        periodsToZeroBal = ((Math.log((mmp/(r-1))/(-1*(princip-(mmp/(r-1)))))) / (((CF*(Math.log(Math.pow(r,2))))-(CF*(Math.log(r))))));
+        totalPeriods += periodsToZeroBal;
+
+        return totalPeriods;
     }
 
     public static void sortByTotalIntr(ArrayList<float[]> comboTable, byte columns) {
@@ -130,10 +239,10 @@ public class Main {
         Collections.sort(comboTable, (a, b) -> Float.compare(a[columns-1], b[columns-1]));
     }
 
-//    public static void sortByFinalPeriod(int[] periodHolder, byte i) {
-//
-//        Arrays.sort(periodHolder, (a, b) -> Arrays.compare(a[i], b[i-1]));
-//    }
+    public static void sortByPeriods(ArrayList<float[]> comboTable, byte columns) {
+
+        Collections.sort(comboTable, (a, b) -> Float.compare(a[columns-1], b[columns-1]));
+    }
 
 
 //    public static void trimComboTable(ArrayList<float[]> comboTable) {
@@ -151,13 +260,11 @@ public class Main {
         ArrayList<float[]> comboTable = new ArrayList<float[]>();
 
         if (totalDebts == 4) {
-
             //starting values of each variable = mmp for that debt
             short mmp1 = (short) mmpList[0];
             short mmp2 = (short) mmpList[1];
             short mmp3 = (short) mmpList[2];
             short mmp4 = (short) mmpList[3];
-//            System.out.println(Arrays.toString(mmpList));
             float sampleMoney = money - (mmp1+mmp2+mmp3+mmp4);
             sampleMoney = sampleMoney/4;
             //each mmp has an even share of the remaining sample money
@@ -181,8 +288,6 @@ public class Main {
                 if ((mmp4 + i) <= range)
                     mmp4Array[i] = (short) (mmp4 + i);
             }
-
-//            comboTable = new ArrayList<float[]>();
 
             //column1 of comboTable; limit = range-mmpList[i] so as not to produce 0's
             short miniRange1 = (short) (range - mmp1);
@@ -211,7 +316,7 @@ public class Main {
                                         row = new float[columns];
                                         short mmp4Entry = mmp4Array[w];
 
-                                        float totalIntr = 0;
+//                                        float totalIntr = 0;
                                         row[0] = mmp1Entry;
                                         row[1] = mmp2Entry;
                                         row[2] = mmp3Entry;
@@ -247,7 +352,6 @@ public class Main {
             short mmp1 = (short) mmpList[0];
             short mmp2 = (short) mmpList[1];
             short mmp3 = (short) mmpList[2];
-//            System.out.println(Arrays.toString(mmpList));
             float sampleMoney = money - (mmp1+mmp2+mmp3);
             sampleMoney = sampleMoney/3;
             float[] sampleArray = {mmp1+sampleMoney,mmp2+sampleMoney,mmp3+sampleMoney};
@@ -288,7 +392,7 @@ public class Main {
                                 row = new float[columns];
                                 short mmp3Entry = mmp3Array[x];
 
-                                float totalIntr = 0;
+//                                float totalIntr = 0;
 
                                 row[0] = mmp1Entry;
                                 row[1] = mmp2Entry;
@@ -322,7 +426,6 @@ public class Main {
             //starting values of each variable = mmp for that debt
             short mmp1 = (short) mmpList[0];
             short mmp2 = (short) mmpList[1];
-//            System.out.println(Arrays.toString(mmpList));
 
             //arrays to contain all possible values in range
             short[] mmp1Array = new short[range];
@@ -345,7 +448,7 @@ public class Main {
                     row = new float[columns];
                     short mmp2Entry = mmp2Array[y];
 
-                    float totalIntr = 0;
+//                    float totalIntr = 0;
 
                     row[0] = mmp1Entry;
                     row[1] = mmp2Entry;
@@ -389,6 +492,405 @@ public class Main {
         return comboTable;
     } //close method
 
+    private static ArrayList<float[]> generateCombosHelper(byte debtNumberA, short mmpA, byte debtNumberB, short mmpB, User user ) {
+
+
+        //here I want to take in 2 debts at a time, get the ideal payments (still with the same money)
+        //then compare the payment amounts, set a max threshold
+        byte debtCount = 2;
+        short moneys = (short) user.getMoney();
+        short range = (short) (moneys - 1); //e.g. if money=500, range = 500 - (columns-2) == 497
+
+        //EXPERIMENT
+
+
+        ArrayList<float[]> helperTable = new ArrayList<float[]>();
+
+            //starting values of each variable = mmp for that debt
+            short mmp1 = mmpA;
+            short mmp2 = mmpB;
+
+            //arrays to contain all possible values in range
+            short[] mmp1Array = new short[range];
+            short[] mmp2Array = new short[range];
+
+            for (short i = 0; i < range; i++) {
+                //populate each array with all possible values in range
+                if ((mmp1 + i) <= range)
+                    mmp1Array[i] = (short) (mmp1 + i);
+                if ((mmp2 + i) <= range)
+                    mmp2Array[i] = (short) (mmp2 + i);
+            }
+
+            //column1 of comboTable; limit = range-mmpList[i] so as not to produce 0's
+            for (short z = 0; ++z <= (range - mmp1);) {
+                float[] row = new float[3];
+                short mmp1Entry = mmp1Array[z];
+                //column2 of comboTable
+                for (short y = 0; ++y <= (range - mmp2); ) {
+                    row = new float[3];
+                    short mmp2Entry = mmp2Array[y];
+
+//                    float totalIntr = 0;
+
+                    row[0] = mmp1Entry;
+                    row[1] = mmp2Entry;
+                    float rowSum = row[0] + row[1];
+
+                    //filter#1: sum of mmp's must == budget
+                    if (rowSum == moneys) {
+
+                        //calculate totalIntr and set as row[3]
+                        if (helperTable.size() > 0) {
+                            if ((row[2] = calculateHelperPeriods(row, debtNumberA, debtNumberB, user)) <= helperTable.get(0)[2]) {
+                                helperTable.add(row);
+                                sortByPeriods(helperTable, ((byte) (3)));
+                                helperTable.remove(1);
+                            }
+                        } else {
+                            row[2] = calculateHelperPeriods(row, debtNumberA, debtNumberB, user);
+                            helperTable.add(row);
+                        }
+                    }
+                } //close combo for loop
+
+//                System.out.println("now with interest as last index");
+//                float[] hh = helperTable.get(0);
+//                hh[(hh.length - 1)] = calculateComboIntr(hh, user);
+
+            }
+        return helperTable;
+    } //close method
+
+    public static ArrayList<float[]> generateCombos2(byte totalDebts, float[] mmpList, User user ) {
+
+        long startTime2 = System.nanoTime();
+
+        byte columns = (byte) (totalDebts + 1); //1 per debt + 1 for the combo's totalIntr
+        short money = (short) user.getMoney();
+        short range = (short) (money - (columns - 2)); //e.g. if money=500, range = 500 - (columns-2) == 497
+        short maxMMP = 1;
+
+
+        float[] sortedMMPs = new float[mmpList.length];
+        for (int i =0; i < mmpList.length; i++) {
+            sortedMMPs[i] = mmpList[i];
+        }
+        Arrays.sort(sortedMMPs);
+        short maxrange = (short)(money - (sortedMMPs[sortedMMPs.length-1]) - columns-2);
+
+//        //Experimental recursion
+//        float[][] testArray = new float[2][4];
+//        testArray[0][0] = generateCombosHelper(2)
+//        float[] holder = new float[3];
+
+
+
+        ArrayList<float[]> comboTable = new ArrayList<float[]>();
+
+        if (totalDebts == 4) {
+
+            //starting values of each variable = mmp for that debt
+            short mmp1 = (short) mmpList[0];
+            short mmp2 = (short) mmpList[1];
+            short mmp3 = (short) mmpList[2];
+            short mmp4 = (short) mmpList[3];
+
+            //Experimental recursion
+            float[] testArray = new float[12];
+            ArrayList<float[]> tempHolder = generateCombosHelper((byte) (0), mmp1, (byte) (1), mmp2, user);
+            try {
+                testArray[0] = tempHolder.get(0)[0];
+                testArray[1] = tempHolder.get(0)[1];
+                tempHolder = generateCombosHelper((byte) (0), mmp1, (byte) (2), mmp3, user);
+                testArray[2] = tempHolder.get(0)[0];
+                testArray[3] = tempHolder.get(0)[1];
+                tempHolder = generateCombosHelper((byte) (0), mmp1, (byte) (3), mmp4, user);
+                testArray[4] = tempHolder.get(0)[0];
+                testArray[5] = tempHolder.get(0)[1];
+                tempHolder = generateCombosHelper((byte) (1), mmp2, (byte) (2), mmp3, user);
+                testArray[6] = tempHolder.get(0)[0];
+                testArray[7] = tempHolder.get(0)[1];
+                tempHolder = generateCombosHelper((byte) (1), mmp2, (byte) (3), mmp4, user);
+                testArray[8] = tempHolder.get(0)[0];
+                testArray[9] = tempHolder.get(0)[1];
+                tempHolder = generateCombosHelper((byte) (2), mmp3, (byte) (3), mmp4, user);
+                testArray[10] = tempHolder.get(0)[0];
+                testArray[11] = tempHolder.get(0)[1];
+
+                Arrays.sort(testArray);
+            } catch (IndexOutOfBoundsException e) {
+                testArray[0] = 0;
+            }
+            maxMMP = (short)testArray[testArray.length-1];
+
+            float sampleMoney = money - (mmp1+mmp2+mmp3+mmp4);
+            sampleMoney = sampleMoney/4;
+            //each mmp has an even share of the remaining sample money
+            float[] sampleArray = {mmp1+sampleMoney,mmp2+sampleMoney,mmp3+sampleMoney,mmp4+sampleMoney};
+            float samplePeriods = calculateComboPeriods(sampleArray,user);
+
+            range = maxMMP;
+            //arrays to contain all possible values in range
+            short[] mmp1Array = new short[range];
+            short[] mmp2Array = new short[range];
+            short[] mmp3Array = new short[range];
+            short[] mmp4Array = new short[range];
+
+            for (short i = 0; ++i <= range;) {
+                //populate each array with all possible values in range (e.g. 5-297
+                if ((mmp1 + i) <= range)
+                    mmp1Array[i] = (short) (mmp1 + i);
+                if ((mmp2 + i) <= range)
+                    mmp2Array[i] = (short) (mmp2 + i);
+                if ((mmp3 + i) <= range)
+                    mmp3Array[i] = (short) (mmp3 + i);
+                if ((mmp4 + i) <= range)
+                    mmp4Array[i] = (short) (mmp4 + i);
+            }
+
+            //EXPERIMENT
+
+
+
+            //column1 of comboTable; limit = range-mmpList[i] so as not to produce 0's
+            short miniRange1 = (short) (range - mmp1);
+            short miniRange2 = (short) (range - mmp2);
+            short miniRange3 = (short) (range - mmp3);
+            short miniRange4 = (short) (range - mmp4);
+            for (short z = 0; ++z <= miniRange1;) {
+                float[] row = new float[columns];
+                short mmp1Entry = mmp1Array[z];
+                //column2 of comboTable
+//                short miniRange2 = (short) (range - mmp2);
+                float[] testArray1 = {mmp1Entry, sampleArray[1], sampleArray[2], sampleArray[3]};
+                if (((samplePeriods = calculateComboPeriods(testArray1, user)) <= samplePeriods) && mmp1Entry <= maxMMP) {
+                    for (short y = 0; ++y <= miniRange2; ) {
+                        row = new float[columns];
+                        short mmp2Entry = mmp2Array[y];
+                        //column3 of comboTable
+//                        short miniRange3 = (short) (range - mmp3);
+                        float[] testArray2 = {sampleArray[0], mmp2Entry, sampleArray[2], sampleArray[3]};
+                        if (calculateComboPeriods(testArray2, user) <= samplePeriods && mmp2Entry <= maxMMP) {
+                            for (short x = 0; ++x <= miniRange3; ) {
+                                row = new float[columns];
+                                short mmp3Entry = mmp3Array[x];
+                                //column 4 of comboTable
+//                                short miniRange4 = (short) (range - mmp4);
+                                float[] testArray3 = {sampleArray[0], sampleArray[1], mmp3Entry, sampleArray[3]};
+                                if (calculateComboPeriods(testArray3, user) <= samplePeriods && mmp3Entry <= maxMMP) {
+                                    for (short w = 0; ++w <= miniRange4; ) {
+                                        row = new float[columns];
+                                        short mmp4Entry = mmp4Array[w];
+
+//                                        float totalIntr = 0;
+                                        row[0] = mmp1Entry;
+                                        row[1] = mmp2Entry;
+                                        row[2] = mmp3Entry;
+                                        row[3] = mmp4Entry;
+                                        float rowSum = row[0] + row[1] + row[2] + row[3];
+
+                                        //filter#1: sum of mmp's must == budget
+                                        if (rowSum == money) {
+
+                                            //calculate totalIntr and set as row[3]
+                                            if (comboTable.size() > 1) {
+                                                if ((row[4] = calculateComboPeriods(row, user)) <= comboTable.get(0)[4]) {
+                                                    comboTable.add(row);
+                                                    sortByPeriods(comboTable, columns);
+                                                    comboTable.remove(2);
+                                                }
+                                            } else {
+                                                row[4] = calculateComboPeriods(row, user);
+                                                comboTable.add(row);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } //close combo for loop
+
+        } else if (totalDebts == 3) {
+
+            //starting values of each variable = mmp for that debt
+            short mmp1 = (short) mmpList[0];
+            short mmp2 = (short) mmpList[1];
+            short mmp3 = (short) mmpList[2];
+
+            //Experimental recursion
+            float[] testArray = new float[6];
+            ArrayList<float[]> tempHolder = generateCombosHelper((byte) (0), mmp1, (byte) (1), mmp2, user);
+            try {
+                testArray[0] = tempHolder.get(0)[0];
+                testArray[1] = tempHolder.get(0)[1];
+                tempHolder = generateCombosHelper((byte) (0), mmp1, (byte) (2), mmp3, user);
+                testArray[2] = tempHolder.get(0)[0];
+                testArray[3] = tempHolder.get(0)[1];
+                tempHolder = generateCombosHelper((byte) (1), mmp2, (byte) (2), mmp3, user);
+                testArray[4] = tempHolder.get(0)[0];
+                testArray[5] = tempHolder.get(0)[1];
+
+                Arrays.sort(testArray);
+            } catch (IndexOutOfBoundsException e) {
+                testArray[0] = 0;
+            }
+            maxMMP = (short)testArray[testArray.length-1];
+
+
+            float sampleMoney = money - (mmp1+mmp2+mmp3);
+            sampleMoney = sampleMoney/3;
+            float[] sampleArray = {mmp1+sampleMoney,mmp2+sampleMoney,mmp3+sampleMoney};
+            float samplePeriods = calculateComboPeriods(sampleArray,user);
+
+            range = maxMMP;
+
+            //arrays to contain all possible values in range
+            short[] mmp1Array = new short[range];
+            short[] mmp2Array = new short[range];
+            short[] mmp3Array = new short[range];
+
+            for (short i = 0; ++i <= range;) {
+                //populate each array with all possible values in range
+                if ((mmp1 + i) <= range)
+                    mmp1Array[i] = (short) (mmp1 + i);
+                if ((mmp2 + i) <= range)
+                    mmp2Array[i] = (short) (mmp2 + i);
+                if ((mmp3 + i) <= range)
+                    mmp3Array[i] = (short) (mmp3 + i);
+            }
+
+            //column1 of comboTable; limit = range-mmpList[i] so as not to produce 0's
+            int alpha=0, beta=0, gamma=0, delta=0;
+            short miniRange1 = (short) (range - mmp1);
+            short miniRange2 = (short) (range - mmp2);
+            short miniRange3 = (short) (range - mmp3);
+            for (short z = 0; ++z <= miniRange1;) {
+                float[] row = new float[columns];
+                short mmp1Entry = mmp1Array[z];
+                //column2 of comboTable
+                float[] testArray1 = {mmp1Entry, sampleArray[1], sampleArray[2]};
+                if (((samplePeriods = calculateComboPeriods(testArray1, user)) <= samplePeriods) && mmp1Entry <= maxMMP) {
+                    for (short y = 0; ++y <= miniRange2; ) {
+                        alpha++;
+                        row = new float[columns];
+                        short mmp2Entry = mmp2Array[y];
+                        //column3 of comboTable
+                        float[] testArray2 = {sampleArray[0], mmp2Entry, sampleArray[2]};
+                        if ((calculateComboPeriods(testArray2, user) <= samplePeriods) && mmp2Entry <= maxMMP) {
+                            for (short x = 0; ++x <= miniRange3; ) {
+                                beta++;
+                                row = new float[columns];
+                                short mmp3Entry = mmp3Array[x];
+
+                                row[0] = mmp1Entry;
+                                row[1] = mmp2Entry;
+                                row[2] = mmp3Entry;
+                                float rowSum = row[0] + row[1] + row[2];
+
+                                //filter#1: sum of mmp's must == budget
+                                if (rowSum==money ) {
+
+                                    gamma++;
+                                    //this is my major timesuck
+                                    //calculate totalIntr and set as row[3]
+                                    if (comboTable.size() > 1) {
+                                        if ((row[3] = calculateComboPeriods(row, user)) <= comboTable.get(0)[3]) {
+                                            comboTable.add(row);
+                                            sortByPeriods(comboTable, columns);
+                                            comboTable.remove(2);
+                                        }
+                                    } else {
+                                        row[3] = calculateComboPeriods(row, user);
+                                        comboTable.add(row);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } //close combo for loop
+            }
+            System.out.println("alpha="+alpha);
+            System.out.println("beta="+beta);
+            System.out.println("gamma="+gamma);
+//            System.out.println("delta="+delta);
+
+        } else if (totalDebts == 2) {
+
+            //starting values of each variable = mmp for that debt
+            short mmp1 = (short) mmpList[0];
+            short mmp2 = (short) mmpList[1];
+
+            //arrays to contain all possible values in range
+            short[] mmp1Array = new short[range];
+            short[] mmp2Array = new short[range];
+
+            for (short i = 0; i < range; i++) {
+                //populate each array with all possible values in range
+                if ((mmp1 + i) <= range)
+                    mmp1Array[i] = (short) (mmp1 + i);
+                if ((mmp2 + i) <= range)
+                    mmp2Array[i] = (short) (mmp2 + i);
+            }
+
+            //column1 of comboTable; limit = range-mmpList[i] so as not to produce 0's
+            for (short z = 0; ++z <= (range - mmp1);) {
+                float[] row = new float[columns];
+                short mmp1Entry = mmp1Array[z];
+                //column2 of comboTable
+                for (short y = 0; ++y <= (range - mmp2);) {
+                    row = new float[columns];
+                    short mmp2Entry = mmp2Array[y];
+
+//                    float totalIntr = 0;
+
+                    row[0] = mmp1Entry;
+                    row[1] = mmp2Entry;
+                    float rowSum = row[0] + row[1];
+
+                    //filter#1: sum of mmp's must == budget
+                    if (rowSum == money) {
+
+                        //calculate totalIntr and set as row[3]
+                        if (comboTable.size() > 1) {
+                            if ((row[2] = calculateComboPeriods(row, user)) <= comboTable.get(0)[2]) {
+                                comboTable.add(row);
+                                sortByPeriods(comboTable, columns);
+                                comboTable.remove(2);
+                            }
+                        } else {
+                            row[2] = calculateComboPeriods(row, user);
+                            comboTable.add(row);
+                        }
+                    }
+                }
+            } //close combo for loop
+
+        } else {
+            System.out.println("Debt quantity out of range. Please enter between 2 and 4 debts.");
+        }
+
+        try {
+            float[] row = comboTable.get(0);
+            row[(row.length-1)] = calculateComboIntr(row, user);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Error: insufficient monthly budget.");
+        }
+//        row[(row.length-1)] = calculateComboIntr(row, user);
+//        System.out.println(row);
+
+
+        double nanoToSec2 = Math.pow(10, -9);
+        long endTime2 = System.nanoTime();
+        long totalTime2 = endTime2 - startTime2;
+        double totalDubTime2 = totalTime2 * nanoToSec2;
+        System.out.println(totalDubTime2);
+
+        return comboTable;
+    } //close method
+
     public static float[] calculateMMPList(User user) {
         int totalDebts = user.getDebts().size();
 
@@ -405,9 +907,9 @@ public class Main {
             float accruedBal = lastPrincipal;
             //interestRate of the current debt in the loop
             float rate = (float) user.debts.get(debtNumber).getInterestRate();
-            float r = (rate / COMPOUND_FREQUENCY);
+            float r = (rate / CF);
             //get minimum monthly payment amount, roundup to nearest int and add 0
-            float mmp = (float) (Math.rint(lastPrincipal * r)) + 0;
+            float mmp = (float) (Math.rint(lastPrincipal * rate)) + 0;
 
             //declare a new array to log all payment transactions against debt
             ArrayList<Float> thisTransactionArray = new ArrayList<Float>();
@@ -530,7 +1032,7 @@ public class Main {
         for (int i = 0; i < periodHolder.length; i++) { //-1 b/c last index is for interest
 //            System.out.println("now parsing debt#"+(i+1)+": "+user.debts.get(i).getDebtName());
 
-            periodHolder[i] = getPeriods(user, row, i); //periodHolder[debtNumber]... user, row, i = debtNumber
+            periodHolder[i] = getPeriods2(user, row, i); //periodHolder[debtNumber]... user, row, i = debtNumber
             System.out.println("Debt#" + (Integer.toString(i + 1)) + " monthly payment: $" + row[i]);
 //            System.out.println("Paid off in "+totalPeriods+" months.");
 
@@ -579,7 +1081,7 @@ public class Main {
         float accruedBal = (float) user.debts.get(debtNumber).getPrincipal();
         short period = 0;
         int finalPeriod = 0;
-        float mmp = row[debtNumber], totalIntr = 0.f, rate = (float) user.debts.get(debtNumber).getInterestRate(), r = (rate / COMPOUND_FREQUENCY);
+        float mmp = row[debtNumber], totalIntr = 0.f, rate = (float) user.debts.get(debtNumber).getInterestRate(), r = (rate / CF);
         ArrayList<Float> thisTransactionArray = new ArrayList<>();
 
         //Loop until zero bal
@@ -609,6 +1111,28 @@ public class Main {
             }
         }
         return finalPeriod;
+    }
+
+    public static int getPeriods2(User user, float[] row, int debtNumber) {
+
+//        System.out.println("row:"+(Arrays.toString(row)));
+//        System.out.println("debt#"+(debtNumber+1));
+
+        float princip = (float) user.debts.get(debtNumber).getPrincipal();
+
+        //interestRate of the current debt in the loop
+        float rate = (float) user.debts.get(debtNumber).getInterestRate();
+        float r = 1+(rate/ CF); //e.g. 1.012
+
+
+        //grab mmp from corresponding index in input array
+        float mmp = row[debtNumber];
+
+        //ln(princip/mmp * (r-1) ) / (ln(r^2) - ln(r) ) = x-intercept of balance function, i.e. when y=0
+        double periodsToZeroBal = ((Math.log((mmp/(r-1))/(-1*(princip-(mmp/(r-1)))))) / (((Math.log(Math.pow(r,2)))-(Math.log(r)))));
+        periodsToZeroBal = Math.ceil(periodsToZeroBal);
+//        System.out.println("periods to 0:"+ periodsToZeroBal);
+        return ((int)periodsToZeroBal);
     }
 }
 
