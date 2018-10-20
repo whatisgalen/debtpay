@@ -18,23 +18,22 @@
       <file leaf-file-name="Main.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/galen/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="24" column="31" lean-forward="true" selection-start-line="24" selection-start-column="31" selection-end-line="24" selection-end-column="31" />
+            <state relative-caret-position="1203">
+              <caret line="954" column="26" lean-forward="true" selection-start-line="954" selection-start-column="26" selection-end-line="954" selection-end-column="26" />
               <folding>
-                <element signature="e#1485#1560#0" />
+                <element signature="e#1365#1440#0" />
                 <element signature="method#calculateComboIntr#0;class#Main#0" />
-                <element signature="e#2980#2987#0" expanded="true" />
+                <element signature="e#2912#2919#0" expanded="true" />
                 <element signature="method#calculateComboIntr2#0;class#Main#0" />
                 <element signature="method#calculateComboPeriods#0;class#Main#0" />
                 <element signature="method#calculateHelperPeriods#0;class#Main#0" />
                 <element signature="method#sortByTotalIntr#0;class#Main#0" />
                 <element signature="method#sortByPeriods#0;class#Main#0" />
-                <element signature="e#8715#8787#0" />
+                <element signature="e#10512#10569#0" />
                 <element signature="method#generateCombos#0;class#Main#0" />
-                <element signature="e#19040#19094#0" />
                 <element signature="method#generateCombosHelper#0;class#Main#0" />
                 <element signature="method#calculateMMPList#0;class#Main#0" />
-                <element signature="e#20602#20609#0" expanded="true" />
+                <element signature="e#41963#41970#0" expanded="true" />
                 <element signature="method#getDebtsFromUser#0;class#Main#0" />
                 <element signature="method#createUser#0;class#Main#0" />
                 <element signature="method#presentData#0;class#Main#0" />
@@ -48,11 +47,8 @@
       <file leaf-file-name="Test.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/galen/Test.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="379">
-              <caret line="60" column="27" lean-forward="true" selection-start-line="60" selection-start-column="27" selection-end-line="60" selection-end-column="27" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="1309">
+              <caret line="78" selection-start-line="78" selection-end-line="78" />
             </state>
           </provider>
         </entry>
@@ -112,9 +108,9 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="776" />
-    <option name="width" value="1146" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="775" />
+    <option name="width" value="1150" />
     <option name="height" value="1080" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -122,29 +118,14 @@
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
-      <pane id="AndroidView" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="debtpayjava" type="b2602c69:ProjectViewProjectNode" />
-              <item name="debtpayjava" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-    </panes>
+    <panes />
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../CS124_Data_Alg/BinarySearchTest" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
-    <property name="settings.editor.selected.configurable" value="preferences.editor" />
+    <property name="settings.editor.selected.configurable" value="terminal" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -185,6 +166,9 @@
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+    </configuration>
+    <configuration name="TestLinkedList" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="TestLinkedList" />
     </configuration>
     <configuration default="true" type="tests" factoryName="Nosetests">
       <module name="untitled104" />
@@ -231,10 +215,12 @@
       <item itemvalue="Application.Main" />
       <item itemvalue="Application.Test" />
       <item itemvalue="Application.Combo" />
+      <item itemvalue="Application.TestLinkedList" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Main" />
+        <item itemvalue="Application.TestLinkedList" />
         <item itemvalue="Application.Test" />
         <item itemvalue="Application.Combo" />
       </list>
@@ -262,7 +248,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="776" y="0" width="1146" height="1080" extended-state="0" />
+    <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="8" />
@@ -273,7 +259,7 @@
       <window_info anchor="right" id="Capture Analysis" order="8" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5032733" side_tool="true" weight="0.26137567" />
       <window_info anchor="right" id="Maven Projects" order="8" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4967267" weight="0.39342523" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4967267" weight="0.39311785" />
       <window_info anchor="bottom" id="Version Control" order="11" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.3286517" />
       <window_info id="Capture Tool" order="7" />
@@ -312,13 +298,10 @@
           <properties />
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="9" />
+      <option name="time" value="14" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/galen/User.java" />
-    <entry file="jar://C:/Program Files/Java/jdk-9/lib/src.zip!/java.base/java/util/Arrays.java" />
-    <entry file="file://$PROJECT_DIR$/src/com/galen/Test.java" />
     <entry file="jar://C:/Program Files/Java/jdk-9/lib/src.zip!/java.base/java/util/Comparator.java" />
     <entry file="file://$PROJECT_DIR$/src/com/galen/Debt.java" />
     <entry file="file://$PROJECT_DIR$/src/com/galen/Combo.java" />
@@ -357,7 +340,6 @@
     <entry file="file://$PROJECT_DIR$/src/com/galen/User.java" />
     <entry file="file://$PROJECT_DIR$/out/production/debtpayjava/com/galen/Main.class" />
     <entry file="jar://C:/Program Files/Java/jdk-9.0.1/lib/src.zip!/java.base/java/lang/Float.java" />
-    <entry file="jar://C:/Program Files/Java/jdk-9.0.1/lib/src.zip!/java.base/java/util/Comparator.java" />
     <entry file="file://$PROJECT_DIR$/src/com/galen/Combo.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
@@ -380,56 +362,44 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://C:/Program Files/Java/jdk-9/lib/src.zip!/java.base/java/lang/invoke/MethodHandles.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="2318" selection-start-line="2318" selection-end-line="2318" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk-9/lib/src.zip!/java.base/java/lang/invoke/MethodHandleNatives.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="51" column="29" selection-start-line="51" selection-start-column="29" selection-end-line="51" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk-9/lib/src.zip!/java.base/java/util/ArrayList.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="194">
-          <caret line="438" selection-start-line="438" selection-end-line="438" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk-9/lib/src.zip!/java.base/java/lang/invoke/MethodHandles.java" />
+    <entry file="jar://C:/Program Files/Java/jdk-9/lib/src.zip!/java.base/java/lang/invoke/MethodHandleNatives.java" />
+    <entry file="jar://C:/Program Files/Java/jdk-9/lib/src.zip!/java.base/java/util/ArrayList.java" />
     <entry file="file://$PROJECT_DIR$/src/com/galen/Test.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="379">
-          <caret line="60" column="27" lean-forward="true" selection-start-line="60" selection-start-column="27" selection-end-line="60" selection-end-column="27" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="1309">
+          <caret line="78" selection-start-line="78" selection-end-line="78" />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../CS124_Data_Alg/textbook_programs/MyLinkedList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="26" column="8" lean-forward="true" selection-start-line="26" selection-start-column="8" selection-end-line="26" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk-9.0.1/lib/src.zip!/java.base/java/util/Comparator.java" />
+    <entry file="jar://C:/Program Files/Java/jdk-9.0.1/lib/src.zip!/java.base/java/util/List.java" />
+    <entry file="jar://C:/Program Files/Java/jdk-9.0.1/lib/src.zip!/java.base/java/util/Collections.java" />
     <entry file="file://$PROJECT_DIR$/src/com/galen/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="24" column="31" lean-forward="true" selection-start-line="24" selection-start-column="31" selection-end-line="24" selection-end-column="31" />
+        <state relative-caret-position="1203">
+          <caret line="954" column="26" lean-forward="true" selection-start-line="954" selection-start-column="26" selection-end-line="954" selection-end-column="26" />
           <folding>
-            <element signature="e#1485#1560#0" />
+            <element signature="e#1365#1440#0" />
             <element signature="method#calculateComboIntr#0;class#Main#0" />
-            <element signature="e#2980#2987#0" expanded="true" />
+            <element signature="e#2912#2919#0" expanded="true" />
             <element signature="method#calculateComboIntr2#0;class#Main#0" />
             <element signature="method#calculateComboPeriods#0;class#Main#0" />
             <element signature="method#calculateHelperPeriods#0;class#Main#0" />
             <element signature="method#sortByTotalIntr#0;class#Main#0" />
             <element signature="method#sortByPeriods#0;class#Main#0" />
-            <element signature="e#8715#8787#0" />
+            <element signature="e#10512#10569#0" />
             <element signature="method#generateCombos#0;class#Main#0" />
-            <element signature="e#19040#19094#0" />
             <element signature="method#generateCombosHelper#0;class#Main#0" />
             <element signature="method#calculateMMPList#0;class#Main#0" />
-            <element signature="e#20602#20609#0" expanded="true" />
+            <element signature="e#41963#41970#0" expanded="true" />
             <element signature="method#getDebtsFromUser#0;class#Main#0" />
             <element signature="method#createUser#0;class#Main#0" />
             <element signature="method#presentData#0;class#Main#0" />
